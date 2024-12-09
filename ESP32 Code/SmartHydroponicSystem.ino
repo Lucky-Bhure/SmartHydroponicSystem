@@ -16,14 +16,14 @@ unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
 // Insert your network credentials
-#define WIFI_SSID "Wi-Fi Name"
-#define WIFI_PASSWORD "Wi-Fi Password"
+#define WIFI_SSID "Harshal's Phone"
+#define WIFI_PASSWORD "Harshal@12"
 
 // Insert Firebase project API Key
-#define API_KEY "Firebase API Key"
+#define API_KEY "AIzaSyAxGmzQ4fEunba1LizOgvljA6y1m7sisIc"
 
 // Insert Firebase RTDB URL*/
-#define DATABASE_URL "Firebase RTDB URL"
+#define DATABASE_URL "https://ahrm-firebase-default-rtdb.firebaseio.com/"
 
 // for dht
 #include "DHT.h"
@@ -117,21 +117,19 @@ float dhtsensor()
     }
     return t;
 }
-int8_t floatswitch()
+boolean floatswitch()
 {
     buttonState = digitalRead(FloatSensor);
     if (buttonState == HIGH)
     {
         digitalWrite(27, HIGH);
         tdssensor();
-        int value =1;
-        return value;
+        return true;
     }
     else
     {
         digitalWrite(27, LOW);
-        int value = 0;
-        return value;
+        return false;
     }
 }
 float watertemp()
@@ -212,7 +210,7 @@ void setup()
         config.database_url = DATABASE_URL;
 
         /* Sign up */
-        if (Firebase.signUp(&config, &auth, "Account E-mail", "Account Password"))
+        if (Firebase.signUp(&config, &auth, "", ""))
 
     {
         Serial.println("ok");
@@ -246,7 +244,7 @@ void setup()
 void loop()
 {
     float env_temperature = dhtsensor();    // DHT11 Data
-    int float_level = floatswitch();        // Float Senser Data
+    bool float_level = floatswitch();        // Float Senser Data
     float water_temp = watertemp();         // DS18B20 Data
     float water_quality = tdssensor();      // TDS Data
     float ph_Value = phsensor();            // pH Sensor Data
@@ -258,7 +256,7 @@ void loop()
         sendDataPrevMillis = millis();
 
         // Environment Temperature From DHT_11 to Firebase
-        if (Firebase.RTDB.setFloat(&fbdo, "DHT_11/Temperature", env_temperature))
+        if (Firebase.RTDB.setFloat(&fbdo, "Sensors/DHT_11/Humidity", env_temperature))
         {
             Serial.print("Temperature : ");
             Serial.println(env_temperature);
@@ -270,7 +268,7 @@ void loop()
         }
 
         // Water Temperature From DS18B20 to Firebase
-        if (Firebase.RTDB.setFloat(&fbdo, "Water/Temperature", water_temp))
+        if (Firebase.RTDB.setFloat(&fbdo, "Sensors/Water/Temperature", water_temp))
         {
             Serial.print(" | Water Temperature : ");
             Serial.print(water_temp);
@@ -282,11 +280,14 @@ void loop()
         }
 
         // Water Temperature From Float Sensor to Firebase
-        if (Firebase.RTDB.setFloat(&fbdo, "Float/Level", float_level))
-
+        if (Firebase.RTDB.setBool(&fbdo, "Sensors/Float/Level", float_level))
         {
             Serial.print(" | Float Level : ");
-            Serial.print(float_level);
+		if(float_level) {
+			Serial.print("High");
+		} else {
+			Serial.print("Low");
+		}
         }
         else
         {
@@ -295,7 +296,7 @@ void loop()
         }
 
         // Water Temperature From pH Sensor to Firebase
-        if (Firebase.RTDB.setFloat(&fbdo, "pH_Sensor/pH_Value", ph_Value))
+        if (Firebase.RTDB.setFloat(&fbdo, "Sensors/pH_Sensor/pH_Value", ph_Value))
         {
             Serial.print(" | pH Value : ");
             Serial.print(ph_Value);
@@ -307,7 +308,7 @@ void loop()
         }
 
         // Water Temperature From TDS Sensor to Firebase
-        if (Firebase.RTDB.setFloat(&fbdo, "TDS/Water_Quality", water_quality))
+        if (Firebase.RTDB.setFloat(&fbdo, "Sensors/TDS/Water_Quality", water_quality))
         {
             Serial.print(" | TDS : ");
             Serial.print(water_quality);
@@ -320,7 +321,7 @@ void loop()
 
         // ON and OFF Fan with Firebase
         bool fan;
-        if (Firebase.RTDB.getBool(&fbdo, "/fanStatus"))
+        if (Firebase.RTDB.getBool(&fbdo, "/devices/fan"))
         {
             fan = fbdo.boolData();
             if (fan == false)
@@ -342,7 +343,7 @@ void loop()
 
         // ON and OFF Submersible Pump with Firebase
         bool pump;
-        if (Firebase.RTDB.getBool(&fbdo, "/pumpStatus"))
+        if (Firebase.RTDB.getBool(&fbdo, "/devices/submersible_pump"))
         {
             pump = fbdo.boolData();
             if (pump == false)
@@ -364,7 +365,7 @@ void loop()
 
         // ON and OFF Solenoid Valve with Firebase
         bool solenoid;
-        if (Firebase.RTDB.getBool(&fbdo, "/solenoidStatus"))
+        if (Firebase.RTDB.getBool(&fbdo, "/devices/solenoid_valve"))
         {
             solenoid = fbdo.boolData();
             if (solenoid == false)
