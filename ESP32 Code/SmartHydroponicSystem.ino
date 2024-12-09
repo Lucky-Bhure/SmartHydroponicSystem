@@ -16,14 +16,14 @@ unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
 // Insert your network credentials
-#define WIFI_SSID "Harshal's Phone"
-#define WIFI_PASSWORD "Harshal@12"
+#define WIFI_SSID "Wifi-Name"
+#define WIFI_PASSWORD "Wifi-Password"
 
 // Insert Firebase project API Key
-#define API_KEY "AIzaSyAxGmzQ4fEunba1LizOgvljA6y1m7sisIc"
+#define API_KEY "Firebase-api-key"
 
 // Insert Firebase RTDB URL*/
-#define DATABASE_URL "https://ahrm-firebase-default-rtdb.firebaseio.com/"
+#define DATABASE_URL "Firebase-database-url"
 
 // for dht
 #include "DHT.h"
